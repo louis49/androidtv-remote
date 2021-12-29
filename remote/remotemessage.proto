@@ -1,0 +1,193 @@
+// remotemessage.proto
+syntax = "proto3";
+package remote;
+
+message RemoteAppLinkLaunchRequest {
+  string app_link = 1;
+}
+
+message RemoteResetPreferredAudioDevice {
+
+}
+
+message RemoteSetPreferredAudioDevice {
+
+}
+
+message RemoteAdjustVolumeLevel {
+
+}
+
+message RemoteSetVolumeLevel {
+  uint32 unknown1 = 1;
+  uint32 unknown2 = 2;
+  string player_model = 3;
+  uint32 unknown4 = 4;
+  uint32 unknown5 = 5;
+  uint32 volume_max = 6;
+  uint32 volume_level = 7;
+  bool volume_muted = 8;
+}
+
+message RemoteStart {
+  bool started = 1;
+}
+
+message RemoteVoiceEnd {
+
+}
+
+message RemoteVoicePayload {
+
+}
+
+message RemoteVoiceBegin {
+
+}
+
+message RemoteTextFieldStatus {
+  int32 counter_field = 1;
+  string value = 2;
+  int32 start = 3;
+  int32 end = 4;
+  int32 int5 = 5;
+  string label = 6;
+}
+
+message RemoteImeShowRequest {
+  RemoteTextFieldStatus remote_text_field_status = 2;
+}
+
+message RemoteEditInfo {
+  int32 insert = 2;
+}
+
+message RemoteImeBatchEdit {
+  int32 ime_counter = 1;
+  int32 field_counter = 2;
+  RemoteEditInfo edit_info = 3;
+}
+
+message RemoteAppInfo {
+  int32 counter = 1;
+  int32 int2 = 2;
+  int32 int3 = 3;
+  int32 int7 = 7;
+  int32 int8 = 8;
+  string label = 10;
+  string app_package = 12;
+  int32 int13 = 13;
+}
+
+message RemoteImeKeyInject {
+  RemoteAppInfo app_info = 1;
+  int32 text_field_status = 2;
+}
+
+enum RemoteKeyCode {
+  UNKNOWN_KEY = 0;
+  FREE = 3;
+  BACK = 4;
+  BUTTON0 = 7;
+  BUTTON1 = 8;
+  BUTTON2 = 9;
+  BUTTON3 = 10;
+  BUTTON4 = 11;
+  BUTTON5 = 12;
+  BUTTON6 = 13;
+  BUTTON7 = 14;
+  BUTTON8 = 15;
+  BUTTON9 = 16;
+  UP = 19;
+  DOWN = 20;
+  LEFT = 21;
+  RIGHT = 22;
+  OK = 23;
+  VOLUME_UP = 24;
+  VOLUME_DOWN = 25;
+  POWER = 26;
+  MENU = 82;
+  PLAY = 85;
+  BACKWARD = 89;
+  FORWARD = 90;
+  NEXT = 125;
+  REC = 130;
+  MUTE = 164;
+  INFO = 165;
+  PROGRAM_UP = 166;
+  PROGRAM_DOWN = 167;
+  ZOOM_IN = 168;
+  ZOOM_OUT = 169;
+  SETTINGS = 176;
+  RED = 183;
+  YELLOW = 185;
+  GREEN = 184;
+  BLUE = 186;
+  BRIGHTNESS_DOWN = 220;
+  BRIGHTNESS_UP = 221;
+}
+
+enum RemoteDirection {
+  UNKNOWN_DIRECTION = 0;
+  START_LONG = 1;
+  END_LONG = 2;
+  SHORT = 3;
+}
+
+message RemoteKeyInject {
+  RemoteKeyCode key_code = 1;
+  RemoteDirection direction = 2;
+}
+
+message RemotePingResponse {
+  int32 val1 = 1;
+}
+
+message RemotePingRequest {
+  int32 val1 = 1;
+  int32 val2 = 2;
+}
+
+message RemoteSetActive {
+  int32 active = 1;
+}
+
+message RemoteDeviceInfo {
+  string model = 1;
+  string vendor = 2;
+  int32 unknown1 = 3;
+  string unknown2 = 4;
+  string package_name = 5;
+  string app_version = 6;
+}
+
+message RemoteConfigure {
+  int32 code1 = 1;
+  RemoteDeviceInfo device_info = 2;
+}
+
+message RemoteError{
+  bool value = 1;
+  RemoteMessage message = 2;
+}
+
+message RemoteMessage {
+  RemoteConfigure remote_configure = 1;
+  RemoteSetActive remote_set_active = 2;
+  RemoteError remote_error = 3;
+  RemotePingRequest remote_ping_request = 8;
+  RemotePingResponse remote_ping_response = 9;
+  RemoteKeyInject remote_key_inject = 10;
+  RemoteImeKeyInject remote_ime_key_inject = 20;
+  RemoteImeBatchEdit remote_ime_batch_edit = 21;
+  RemoteImeShowRequest remote_ime_show_request = 22;
+  RemoteVoiceBegin remote_voice_begin = 30;
+  RemoteVoicePayload remote_voice_payload = 31;
+  RemoteVoiceEnd remote_voice_end = 32;
+  RemoteStart remote_start = 40;
+  RemoteSetVolumeLevel remote_set_volume_level = 50;
+  RemoteAdjustVolumeLevel remote_adjust_volume_level = 51;
+  RemoteSetPreferredAudioDevice remote_set_preferred_audio_device = 60;
+  RemoteResetPreferredAudioDevice remote_reset_preferred_audio_device = 61;
+  RemoteAppLinkLaunchRequest remote_app_link_launch_request = 90;
+}

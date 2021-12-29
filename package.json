@@ -1,0 +1,32 @@
+{
+  "name": "androidtv-remote",
+  "version": "1.0.0",
+  "description": "AndroidTV Remote",
+  "main": "index.js",
+  "engines": {
+    "node": ">=14.18.1"
+  },
+  "keywords": [
+    "androidtv",
+    "remote",
+    "freebox",
+    "freebox-player-pop",
+    "freemox-mini-4k"
+  ],
+  "author": "@louis49",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^4.1.1",
+    "node-forge": "^0.10.0",
+    "protobufjs": "^6.11.2",
+    "systeminformation": "^5.9.17"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "type": "module",
+  "homepage": "https://github.com/louis49/androidtv-remote",
+  "bugs": {
+    "url": "https://github.com/louis49/androidtv-remote/issues"
+  }
+}
