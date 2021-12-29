@@ -3,7 +3,7 @@ import { system } from "systeminformation"
 
 class RemoteMessageManager {
     constructor() {
-        this.root = protobufjs.loadSync("./remote/remotemessage.proto");
+        this.root = protobufjs.loadSync("remote/remotemessage.proto");
         this.RemoteMessage = this.root.lookupType("remote.RemoteMessage");
         this.RemoteKeyCode = this.root.lookupEnum("remote.RemoteKeyCode").values;
         this.RemoteDirection = this.root.lookupEnum("remote.RemoteDirection").values;

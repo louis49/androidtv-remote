@@ -3,7 +3,7 @@ import {system} from "systeminformation";
 
 class PairingMessageManager {
     constructor(){
-        this.root = protobufjs.loadSync("./pairing/pairingmessage.proto");
+        this.root = protobufjs.loadSync("pairing/pairingmessage.proto");
 
         this.PairingMessage = this.root.lookupType("pairing.PairingMessage");
         this.Status = this.root.lookupEnum("pairing.PairingMessage.Status").values;
