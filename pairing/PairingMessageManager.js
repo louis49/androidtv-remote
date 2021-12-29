@@ -1,9 +1,15 @@
 import protobufjs from "protobufjs";
 import {system} from "systeminformation";
+import { fileURLToPath } from 'url';
+import { dirname } from "path";
+import * as path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 class PairingMessageManager {
     constructor(){
-        this.root = protobufjs.loadSync("pairing/pairingmessage.proto");
+        this.root = protobufjs.loadSync(path.join(__dirname,"pairingmessage.proto"));
 
         this.PairingMessage = this.root.lookupType("pairing.PairingMessage");
         this.Status = this.root.lookupEnum("pairing.PairingMessage.Status").values;
