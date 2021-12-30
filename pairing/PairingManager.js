@@ -15,7 +15,7 @@ class PairingManager extends EventEmitter {
     }
 
     sendCode(code){
-        console.log("Sending code");
+        console.debug("Sending code : ", code);
         let code_bytes = this.hexStringToBytes(code);
 
         let client_certificate = this.client.getCertificate();
@@ -55,7 +55,7 @@ class PairingManager extends EventEmitter {
             console.debug("Start Pairing Connect");
             this.client = tls.connect(options, function (){
                 console.debug(this.host + " Pairing connected")
-            });
+            }.bind(this));
 
             this.client.pairingManager = this;
 

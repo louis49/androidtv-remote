@@ -43,8 +43,8 @@ class RemoteManager extends EventEmitter {
                     let message = remoteMessageManager.parse(this.chunks);
 
                     if(!message.remotePingRequest){
-                        console.debug("Receive : " + Array.from(this.chunks));
-                        console.debug("Receive : " + JSON.stringify(message.toJSON()));
+                        //console.debug(this.host + " Receive : " + Array.from(this.chunks));
+                        console.debug(this.host + " Receive : " + JSON.stringify(message.toJSON()));
                     }
 
                     if(message.remoteConfigure){
@@ -97,6 +97,7 @@ class RemoteManager extends EventEmitter {
                     }
                     else if(message.remoteError){
                         //console.debug("Receive REMOTE ERROR");
+                        this.emit('error', {error : message.remoteError});
                     }
                     else{
                         console.log("What else ?");
@@ -106,16 +107,19 @@ class RemoteManager extends EventEmitter {
             }.bind(this));
 
             this.client.on('close', async function(hasError) {
-                console.log("Remote Connection closed " + hasError);
+                console.error(this.host + " Remote Connection closed ", hasError);
                 if(hasError){
+                    /*
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                     await this.start().catch(function (error) {
                         console.error(error);
                     });
+                     */
                 }
             }.bind(this));
 
             this.client.on('error', function(error) {
-                console.error(error);
+                console.error(this.host, error);
                 reject(error.code)
             }.bind(this));
         });
@@ -125,7 +129,7 @@ class RemoteManager extends EventEmitter {
     sendPower(){
         this.client.write(remoteMessageManager.createRemoteKeyInject(
             remoteMessageManager.RemoteDirection.SHORT,
-            remoteMessageManager.RemoteKeyCode.POWER));
+            remoteMessageManager.RemoteKeyCode.KEYCODE_POWER));
     }
 
     sendKey(key, direction){

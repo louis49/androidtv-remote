@@ -34,7 +34,8 @@ class RemoteMessageManager {
         let array = this.RemoteMessage.encodeDelimited(message).finish()
 
         if(!payload.remotePingResponse){
-            console.debug("Sending " + Array.from(array));
+            //console.debug("Sending " + Array.from(array));
+            console.debug("Sending " + JSON.stringify(message.toJSON()));
         }
 
         return array;

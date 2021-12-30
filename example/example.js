@@ -38,8 +38,16 @@ androidRemote.on('current_app', function (current_app){
     console.debug("Current App : " + current_app);
 });
 
+androidRemote.on('error', function (error){
+    console.error("Error : " + error);
+});
+
 androidRemote.on('ready', async function (){
     let cert = androidRemote.getCertificate();
+
+    androidRemote.sendKey(RemoteKeyCode.BUTTON0, RemoteDirection.START_LONG)
+    await new Promise(resolve => setTimeout(resolve, 100));
+    androidRemote.sendKey(RemoteKeyCode.BUTTON0, RemoteDirection.END_LONG)
 
     androidRemote.sendKey(RemoteKeyCode.MUTE, RemoteDirection.SHORT)
 
