@@ -109,12 +109,10 @@ class RemoteManager extends EventEmitter {
             this.client.on('close', async function(hasError) {
                 console.error(this.host + " Remote Connection closed ", hasError);
                 if(hasError){
-                    /*
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     await this.start().catch(function (error) {
                         console.error(error);
                     });
-                     */
                 }
             }.bind(this));
 
