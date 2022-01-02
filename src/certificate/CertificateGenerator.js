@@ -1,7 +1,7 @@
 import forge from "node-forge"
 import crypto from "crypto";
 
-class CertificateGenerator {
+export class CertificateGenerator {
 
     static generateFull(name, country, state, locality, organisation, OU){
         let keys = forge.pki.rsa.generateKeyPair(2048);
@@ -31,4 +31,4 @@ class CertificateGenerator {
     }
 }
 
-export { CertificateGenerator };
+//export { CertificateGenerator };

@@ -2,7 +2,7 @@ import {
     AndroidRemote,
     RemoteKeyCode,
     RemoteDirection
-} from "../index.js";
+} from "androidtv-remote";
 
 import Readline from "readline";
 
@@ -11,7 +11,7 @@ let line = Readline.createInterface({
     output: process.stdout
 });
 
-let host = "Android.local";
+let host = "192.168.1.31";
 let options = {
     pairing_port : 6467,
     remote_port : 6466,

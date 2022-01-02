@@ -1,0 +1,15 @@
+{
+  "name": "androidtv-remote-example",
+  "version": "1.0.0",
+  "description": "AndroidTV Remote Example",
+  "main": "example.js",
+  "engines": {
+    "node": ">=14.18.1"
+  },
+  "author": "@louis49",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "androidtv-remote": "^1.0.5"
+  }
+}

@@ -1,11 +1,6 @@
 import protobufjs from "protobufjs";
 import {system} from "systeminformation";
-import { fileURLToPath } from 'url';
-import { dirname } from "path";
 import * as path from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 class PairingMessageManager {
     constructor(){
@@ -19,7 +14,7 @@ class PairingMessageManager {
         system().then(function (data){
             pairingMessageManager.manufacturer = data.manufacturer;
             pairingMessageManager.model = data.model;
-        })
+        });
     }
 
     create(payload){

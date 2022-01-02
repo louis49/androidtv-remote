@@ -1,10 +1,13 @@
 {
   "name": "androidtv-remote",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "AndroidTV Remote",
-  "main": "index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=14.18.1"
+  },
+  "scripts": {
+    "babel": "babel ./src/*.* --out-dir dist --delete-dir-on-start -D && babel ./src/certificate/*.* --out-dir dist/certificate -D && babel ./src/pairing/*.* --out-dir dist/pairing -D && babel ./src/remote/*.* --out-dir dist/remote -D"
   },
   "keywords": [
     "androidtv",
@@ -22,9 +25,12 @@
     "systeminformation": "^5.9.17"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "@babel/cli": "^7.16.7",
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.0.0",
+    "core-js": "^3.20.2"
   },
-  "type": "module",
+  "type": "commonjs",
   "homepage": "https://github.com/louis49/androidtv-remote",
   "bugs": {
     "url": "https://github.com/louis49/androidtv-remote/issues"

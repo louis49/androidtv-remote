@@ -4,7 +4,7 @@ import {RemoteManager} from "./remote/RemoteManager.js";
 import {remoteMessageManager} from "./remote/RemoteMessageManager.js";
 import EventEmitter from "events";
 
-class AndroidRemote extends EventEmitter {
+export class AndroidRemote extends EventEmitter {
     constructor(host, options)
     {
         super();
@@ -18,9 +18,9 @@ class AndroidRemote extends EventEmitter {
         this.service_name = options.service_name?options.service_name:"Service Name";
     }
 
-    async start(){
+    async start() {
 
-        if(!this.cert.key || !this.cert.cert){
+        if (!this.cert.key || !this.cert.cert) {
             this.cert = CertificateGenerator.generateFull(
                 this.service_name,
                 'CNT',
@@ -37,7 +37,7 @@ class AndroidRemote extends EventEmitter {
                 console.error(error);
             });
 
-            if(!paired){
+            if (!paired) {
                 return;
             }
         }
@@ -54,7 +54,7 @@ class AndroidRemote extends EventEmitter {
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        let started = await this.remoteManager.start().catch(function (error){
+        let started = await this.remoteManager.start().catch(function (error) {
             console.error(error);
         });
 
@@ -93,8 +93,13 @@ class AndroidRemote extends EventEmitter {
 let RemoteKeyCode = remoteMessageManager.RemoteKeyCode;
 let RemoteDirection = remoteMessageManager.RemoteDirection;
 export {
+    RemoteKeyCode,
+    RemoteDirection,
+}
+export default {
     AndroidRemote,
     CertificateGenerator,
     RemoteKeyCode,
     RemoteDirection,
 }
+

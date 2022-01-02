@@ -44,7 +44,7 @@ class PairingManager extends EventEmitter {
 
     async start() {
         return new Promise((resolve, reject) => {
-            var options = {
+            let options = {
                 key : this.certs.key,
                 cert: this.certs.cert,
                 port: this.port,

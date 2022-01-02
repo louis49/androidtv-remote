@@ -19,7 +19,7 @@ class RemoteManager extends EventEmitter {
                 port: this.port,
                 host : this.host,
                 rejectUnauthorized: false
-            }
+            };
 
             console.debug("Start Remote Connect");
 
