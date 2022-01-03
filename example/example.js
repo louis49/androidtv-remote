@@ -43,18 +43,22 @@ androidRemote.on('error', function (error){
 });
 
 androidRemote.on('ready', async function (){
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     let cert = androidRemote.getCertificate();
 
-    androidRemote.sendKey(RemoteKeyCode.BUTTON0, RemoteDirection.START_LONG)
+    androidRemote.sendKey(RemoteKeyCode.KEYCODE_0, RemoteDirection.START_LONG)
     await new Promise(resolve => setTimeout(resolve, 100));
-    androidRemote.sendKey(RemoteKeyCode.BUTTON0, RemoteDirection.END_LONG)
+    androidRemote.sendKey(RemoteKeyCode.KEYCODE_0, RemoteDirection.END_LONG)
 
-    androidRemote.sendKey(RemoteKeyCode.MUTE, RemoteDirection.SHORT)
-
+    androidRemote.sendKey(RemoteKeyCode.KEYCODE_MUTE, RemoteDirection.SHORT)
+    await new Promise(resolve => setTimeout(resolve, 10000));
     androidRemote.sendAppLink("https://www.disneyplus.com");
 }.bind(this))
 
 let started = await androidRemote.start();
+
+await new Promise(resolve => setTimeout(resolve, 60000));
 
 androidRemote.stop();
 

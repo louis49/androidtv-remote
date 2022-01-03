@@ -1,6 +1,6 @@
 {
   "name": "androidtv-remote",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "AndroidTV Remote",
   "main": "dist/index.js",
   "engines": {
@@ -14,7 +14,7 @@
     "remote",
     "freebox",
     "freebox-player-pop",
-    "freemox-mini-4k"
+    "freebox-mini-4k"
   ],
   "author": "@louis49",
   "license": "ISC",

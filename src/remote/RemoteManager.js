@@ -140,7 +140,7 @@ class RemoteManager extends EventEmitter {
         this.client.write(remoteMessageManager.createRemoteRemoteAppLinkLaunchRequest(app_link));
     }
 
-    async stop(){
+    stop(){
         this.client.destroy();
     }
 }
