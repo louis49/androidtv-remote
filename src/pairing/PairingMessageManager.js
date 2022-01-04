@@ -2,16 +2,20 @@ import protobufjs from "protobufjs";
 import {system} from "systeminformation";
 import * as path from "path";
 
+import { fileURLToPath } from 'url';
+import { dirname } from "path";
+const directory = dirname(fileURLToPath(import.meta.url));
+
 class PairingMessageManager {
     constructor(){
-        this.root = protobufjs.loadSync(path.join(__dirname,"pairingmessage.proto"));
+        this.root = protobufjs.loadSync(path.join(directory,"pairingmessage.proto"));
 
         this.PairingMessage = this.root.lookupType("pairing.PairingMessage");
         this.Status = this.root.lookupEnum("pairing.PairingMessage.Status").values;
         this.RoleType = this.root.lookupEnum("RoleType").values;
         this.EncodingType = this.root.lookupEnum("pairing.PairingEncoding.EncodingType").values;
 
-        system().then(function (data){
+        system().then((data) => {
             pairingMessageManager.manufacturer = data.manufacturer;
             pairingMessageManager.model = data.model;
         });
@@ -67,14 +71,13 @@ class PairingMessageManager {
     }
 
     createPairingSecret(secret){
-        let json = {
+        return this.create({
             pairingSecret: {
                 secret : secret
             },
             status: this.Status.STATUS_OK,
             protocolVersion: 2
-        };
-        return this.create(json);
+        });
     }
 
     parse(buffer){

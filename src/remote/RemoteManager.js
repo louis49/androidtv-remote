@@ -9,6 +9,7 @@ class RemoteManager extends EventEmitter {
         this.port = port;
         this.certs = certs;
         this.chunks = Buffer.from([]);
+        this.error = null;
     }
 
     async start() {
@@ -23,18 +24,24 @@ class RemoteManager extends EventEmitter {
 
             console.debug("Start Remote Connect");
 
-            this.client = tls.connect(options, function (){
-                //console.log("Remote connected")
+            this.client = tls.connect(options, () => {
+                //console.debug("Remote connected")
             });
 
-            this.client.remoteManager = this;
+            this.client.on('timeout', () => {
+                console.debug('timeout');
+                this.client.destroy();
+            });
 
-            this.client.on("secureConnect", function() {
+            // Le ping est reçu toutes les 5 secondes
+            this.client.setTimeout(10000);
+
+            this.client.on("secureConnect", () => {
                 console.debug(this.host + " Remote secureConnect");
                 resolve(true);
-            }.bind(this));
+            });
 
-            this.client.on('data', function (data) {
+            this.client.on('data', (data) => {
                 let buffer = Buffer.from(data);
                 this.chunks = Buffer.concat([this.chunks, buffer]);
 
@@ -104,22 +111,43 @@ class RemoteManager extends EventEmitter {
                     }
                     this.chunks = Buffer.from([]);
                 }
-            }.bind(this));
+            });
 
-            this.client.on('close', async function(hasError) {
-                console.error(this.host + " Remote Connection closed ", hasError);
+            this.client.on('close', async (hasError) => {
+                console.info(this.host + " Remote Connection closed ", hasError);
                 if(hasError){
+                    reject(this.error.code);
+                    if(this.error.code === "ECONNRESET"){
+                        this.emit('unpaired');
+                    }
+                    else if(this.error.code === "ECONNREFUSED"){
+                        // L'appareil n'est pas encore prêt : on relance
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await this.start().catch((error) => {
+                            console.error(error);
+                        });
+                    }
+                    else{
+                        // Dans le doute on redémarre
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await this.start().catch((error) => {
+                            console.error(error);
+                        });
+                    }
+                }
+                else {
+                    // Si pas d'erreur on relance. Si elle s'est éteinte alors une erreur empéchera de relancer encore
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    await this.start().catch(function (error) {
+                    await this.start().catch((error) => {
                         console.error(error);
                     });
                 }
-            }.bind(this));
+            });
 
-            this.client.on('error', function(error) {
+            this.client.on('error', (error) => {
                 console.error(this.host, error);
-                reject(error.code)
-            }.bind(this));
+                this.error = error;
+            });
         });
 
     }

@@ -53,18 +53,18 @@ class PairingManager extends EventEmitter {
             }
 
             console.debug("Start Pairing Connect");
-            this.client = tls.connect(options, function (){
+            this.client = tls.connect(options, () => {
                 console.debug(this.host + " Pairing connected")
-            }.bind(this));
+            });
 
             this.client.pairingManager = this;
 
-            this.client.on("secureConnect", function() {
+            this.client.on("secureConnect", () => {
                 console.debug(this.host + " Pairing secure connected ");
                 this.client.write(pairingMessageManager.createPairingRequest(this.service_name));
-            }.bind(this));
+            });
 
-            this.client.on('data', function (data) {
+            this.client.on('data', (data) => {
                 let buffer = Buffer.from(data);
                 this.chunks = Buffer.concat([this.chunks, buffer]);
 
@@ -98,9 +98,9 @@ class PairingManager extends EventEmitter {
                     }
                     this.chunks = Buffer.from([]);
                 }
-            }.bind(this));
+            });
 
-            this.client.on('close', function(hasError) {
+            this.client.on('close', (hasError) => {
                 console.debug(this.host + " Pairing Connection closed", hasError);
                 if(hasError){
                     reject(false);
@@ -108,11 +108,11 @@ class PairingManager extends EventEmitter {
                 else{
                     resolve(true);
                 }
-            }.bind(this));
+            });
 
-            this.client.on('error', function(error) {
+            this.client.on('error', (error) => {
                 console.error(error);
-            }.bind(this));
+            });
         });
 
     }

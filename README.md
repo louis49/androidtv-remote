@@ -24,31 +24,31 @@ let options = {
 
 let androidRemote = new AndroidRemote(host, options)
 
-androidRemote.on('secret', function (){
-    line.question("Code : ", async function (code){
+androidRemote.on('secret', () => {
+    line.question("Code : ", async (code) => {
         androidRemote.sendCode(code);
-    }.bind(this));
+    });
 });
 
-androidRemote.on('powered', function (powered){
+androidRemote.on('powered', (powered) => {
     console.debug("Powered : " + powered)
 });
 
-androidRemote.on('volume', function (volume){
+androidRemote.on('volume', (volume) => {
     console.debug("Volume : " + volume.level + '/' + volume.maximum + " | Muted : " + volume.muted);
 });
 
-androidRemote.on('current_app', function (current_app){
+androidRemote.on('current_app', (current_app) => {
     console.debug("Current App : " + current_app);
 });
 
-androidRemote.on('ready', async function (){
+androidRemote.on('ready', async () => {
     let cert = androidRemote.getCertificate();
 
     androidRemote.sendKey(RemoteKeyCode.MUTE, RemoteDirection.SHORT)
 
     androidRemote.sendAppLink("https://www.disneyplus.com");
-}.bind(this))
+});
 
 let started = await androidRemote.start();
 ```

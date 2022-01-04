@@ -1,6 +1,6 @@
 {
   "name": "androidtv-remote",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "AndroidTV Remote",
   "main": "dist/index.js",
   "engines": {
@@ -28,7 +28,8 @@
   "devDependencies": {
     "@babel/cli": "^7.16.7",
     "@babel/core": "^7.16.7",
-    "@babel/preset-env": "^7.0.0"
+    "@babel/preset-env": "^7.0.0",
+    "babel-plugin-transform-import-meta": "^2.1.0"
   },
   "type": "commonjs",
   "homepage": "https://github.com/louis49/androidtv-remote",

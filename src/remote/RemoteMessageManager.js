@@ -2,17 +2,21 @@ import protobufjs from "protobufjs";
 import { system } from "systeminformation"
 import * as path from "path";
 
+import { fileURLToPath } from 'url';
+import { dirname } from "path";
+const directory = dirname(fileURLToPath(import.meta.url));
+
 class RemoteMessageManager {
     constructor() {
-        this.root = protobufjs.loadSync(path.join(__dirname,"remotemessage.proto"));
+        this.root = protobufjs.loadSync(path.join(directory,"remotemessage.proto"));
         this.RemoteMessage = this.root.lookupType("remote.RemoteMessage");
         this.RemoteKeyCode = this.root.lookupEnum("remote.RemoteKeyCode").values;
         this.RemoteDirection = this.root.lookupEnum("remote.RemoteDirection").values;
 
-        system().then(function (data){
+        system().then((data) => {
             this.manufacturer = data.manufacturer;
             this.model = data.model;
-        }.bind(this));
+        });
     }
 
     create(payload){
@@ -37,7 +41,7 @@ class RemoteMessageManager {
     }
 
     createRemoteConfigure(code1, model, vendor, unknown1, unknown2){
-        let message = this.create({
+        return this.create({
             remoteConfigure:{
                 code1 : 622,
                 deviceInfo : {
@@ -50,8 +54,6 @@ class RemoteMessageManager {
                 }
             }
         });
-
-        return message;
     }
 
     createRemoteSetActive(active){
