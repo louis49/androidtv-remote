@@ -127,6 +127,9 @@ class RemoteManager extends EventEmitter {
                             console.error(error);
                         });
                     }
+                    else if(this.error.code === "EHOSTDOWN"){
+                        // L'appareil est down, on ne fait rien
+                    }
                     else{
                         // Dans le doute on redémarre
                         await new Promise(resolve => setTimeout(resolve, 1000));
