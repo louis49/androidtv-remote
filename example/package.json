@@ -10,6 +10,6 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "androidtv-remote": "^1.0.8"
+    "androidtv-remote": "^1.0.10"
   }
 }
