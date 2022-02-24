@@ -49,7 +49,7 @@ class RemoteMessageManager {
                     vendor : this.manufacturer,
                     unknown1 : 1,
                     unknown2 : "1",
-                    packageName : "androitv-remote",
+                    packageName : "androidtv-remote",
                     appVersion : "1.0.0",
                 }
             }
