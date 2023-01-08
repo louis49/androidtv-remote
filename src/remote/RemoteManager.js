@@ -1,6 +1,7 @@
 import tls from "tls";
 import { remoteMessageManager } from "./RemoteMessageManager.js";
 import EventEmitter from "events";
+import protobufjs from "protobufjs";
 
 class RemoteManager extends EventEmitter {
     constructor(host, port, certs) {
@@ -8,8 +9,6 @@ class RemoteManager extends EventEmitter {
         this.host = host;
         this.port = port;
         this.certs = certs;
-        this.chunks = Buffer.from([]);
-        this.error = null;
     }
 
     async start() {
@@ -21,6 +20,10 @@ class RemoteManager extends EventEmitter {
                 host : this.host,
                 rejectUnauthorized: false
             };
+
+            this.chunks = Buffer.from([]);
+            this.error = null;
+            this.autoReconnect = true;
 
             console.debug("Start Remote Connect");
 
@@ -38,16 +41,30 @@ class RemoteManager extends EventEmitter {
 
             this.client.on("secureConnect", () => {
                 console.debug(this.host + " Remote secureConnect");
+                reject = null;
                 resolve(true);
             });
 
             this.client.on('data', (data) => {
-                let buffer = Buffer.from(data);
-                this.chunks = Buffer.concat([this.chunks, buffer]);
+                this.chunks = Buffer.concat([this.chunks, Buffer.from(data)]);
+                if (this.chunks.length === 0) {
+                    return;
+                }
 
-                if(this.chunks.length > 0 && this.chunks.readInt8(0) === this.chunks.length - 1){
+                let reader = protobufjs.Reader.create(this.chunks);
+                let expectedSize = null;
+                try {
+                    expectedSize = reader.uint32();
+                    expectedSize += reader.pos;
+                } catch (error) {
+                    if (! (error instanceof RangeError)) {
+                        throw error;
+                    }
+                }
 
-                    let message = remoteMessageManager.parse(this.chunks);
+                if ((expectedSize !== null) && (this.chunks.length >= expectedSize)) {
+                    let message = remoteMessageManager.RemoteMessage.decode(reader);
+                    this.chunks = this.chunks.subarray(reader.pos);
 
                     if(!message.remotePingRequest){
                         //console.debug(this.host + " Receive : " + Array.from(this.chunks));
@@ -109,41 +126,33 @@ class RemoteManager extends EventEmitter {
                     else{
                         console.log("What else ?");
                     }
-                    this.chunks = Buffer.from([]);
                 }
             });
 
             this.client.on('close', async (hasError) => {
                 console.info(this.host + " Remote Connection closed ", hasError);
                 if(hasError){
-                    reject(this.error.code);
+                    if (reject != null) {
+                        reject(this.error.code);
+                    }
                     if(this.error.code === "ECONNRESET"){
                         this.emit('unpaired');
                     }
                     else if(this.error.code === "ECONNREFUSED"){
                         // L'appareil n'est pas encore prêt : on relance
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        await this.start().catch((error) => {
-                            console.error(error);
-                        });
+                        await this.maybeReconnect();
                     }
                     else if(this.error.code === "EHOSTDOWN"){
                         // L'appareil est down, on ne fait rien
                     }
                     else{
                         // Dans le doute on redémarre
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        await this.start().catch((error) => {
-                            console.error(error);
-                        });
+                        await this.maybeReconnect();
                     }
                 }
                 else {
                     // Si pas d'erreur on relance. Si elle s'est éteinte alors une erreur empéchera de relancer encore
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    await this.start().catch((error) => {
-                        console.error(error);
-                    });
+                    await this.maybeReconnect();
                 }
             });
 
@@ -153,6 +162,15 @@ class RemoteManager extends EventEmitter {
             });
         });
 
+    }
+
+    async maybeReconnect() {
+        if (this.autoReconnect) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await this.start().catch((error) => {
+                console.error(error);
+            });
+        }
     }
 
     sendPower(){
@@ -172,6 +190,7 @@ class RemoteManager extends EventEmitter {
     }
 
     stop(){
+        this.autoReconnect = false;
         this.client.destroy();
     }
 }
