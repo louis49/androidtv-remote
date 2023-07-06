@@ -16,6 +16,7 @@ export class AndroidRemote extends EventEmitter {
         this.pairing_port = options.pairing_port?options.pairing_port:6467;
         this.remote_port = options.remote_port?options.remote_port:6466;
         this.service_name = options.service_name?options.service_name:"Service Name";
+        this.reconnect_timeout = options.reconnect_timeout?options.reconnect_timeout:1000;
     }
 
     async start() {
@@ -42,7 +43,7 @@ export class AndroidRemote extends EventEmitter {
             }
         }
 
-        this.remoteManager = new RemoteManager(this.host, this.remote_port, this.cert);
+        this.remoteManager = new RemoteManager(this.host, this.remote_port, this.cert, this.reconnect_timeout);
 
         this.remoteManager.on('powered', (powered) => this.emit('powered', powered));
 

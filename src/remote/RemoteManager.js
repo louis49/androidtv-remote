@@ -3,11 +3,12 @@ import { remoteMessageManager } from "./RemoteMessageManager.js";
 import EventEmitter from "events";
 
 class RemoteManager extends EventEmitter {
-    constructor(host, port, certs) {
+    constructor(host, port, certs, reconnectTimeout = 1000) {
         super();
         this.host = host;
         this.port = port;
         this.certs = certs;
+        this.reconnectTimeout = reconnectTimeout;
         this.chunks = Buffer.from([]);
         this.error = null;
     }
@@ -22,22 +23,22 @@ class RemoteManager extends EventEmitter {
                 rejectUnauthorized: false
             };
 
-            console.debug("Start Remote Connect");
+            this.emit('log.debug', "Start Remote Connect");
 
             this.client = tls.connect(options, () => {
-                //console.debug("Remote connected")
+                //this.emit('log.debug', "Remote connected")
             });
 
             this.client.on('timeout', () => {
-                console.debug('timeout');
+                this.emit('log.debug', 'timeout');
                 this.client.destroy();
             });
 
-            // Le ping est reçu toutes les 5 secondes
+            // The ping is received every 5 seconds.
             this.client.setTimeout(10000);
 
             this.client.on("secureConnect", () => {
-                console.debug(this.host + " Remote secureConnect");
+                this.emit('log.debug', this.host + " Remote secureConnect");
                 resolve(true);
             });
 
@@ -50,8 +51,8 @@ class RemoteManager extends EventEmitter {
                     let message = remoteMessageManager.parse(this.chunks);
 
                     if(!message.remotePingRequest){
-                        //console.debug(this.host + " Receive : " + Array.from(this.chunks));
-                        console.debug(this.host + " Receive : " + JSON.stringify(message.toJSON()));
+                        //this.emit('log.debug', this.host + " Receive : " + Array.from(this.chunks));
+                        this.emit('log.debug', this.host + " Receive : " + JSON.stringify(message.toJSON()));
                     }
 
                     if(message.remoteConfigure){
@@ -74,19 +75,19 @@ class RemoteManager extends EventEmitter {
                         this.emit('current_app', message.remoteImeKeyInject.appInfo.appPackage);
                     }
                     else if(message.remoteImeBatchEdit){
-                        console.debug("Receive IME BATCH EDIT" + message.remoteImeBatchEdit);
+                        this.emit('log.debug', "Receive IME BATCH EDIT" + message.remoteImeBatchEdit);
                     }
                     else if(message.remoteImeShowRequest){
-                        console.debug("Receive IME SHOW REQUEST" + message.remoteImeShowRequest);
+                        this.emit('log.debug', "Receive IME SHOW REQUEST" + message.remoteImeShowRequest);
                     }
                     else if(message.remoteVoiceBegin){
-                        //console.debug("Receive VOICE BEGIN" + message.remoteVoiceBegin);
+                        //this.emit('log.debug', "Receive VOICE BEGIN" + message.remoteVoiceBegin);
                     }
                     else if(message.remoteVoicePayload){
-                        //console.debug("Receive VOICE PAYLOAD" + message.remoteVoicePayload);
+                        //this.emit('log.debug', "Receive VOICE PAYLOAD" + message.remoteVoicePayload);
                     }
                     else if(message.remoteVoiceEnd){
-                        //console.debug("Receive VOICE END" + message.remoteVoiceEnd);
+                        //this.emit('log.debug', "Receive VOICE END" + message.remoteVoiceEnd);
                     }
                     else if(message.remoteStart){
                         this.emit('powered', message.remoteStart.started);
@@ -97,24 +98,25 @@ class RemoteManager extends EventEmitter {
                             maximum : message.remoteSetVolumeLevel.volumeMax,
                             muted : message.remoteSetVolumeLevel.volumeMuted,
                         });
-                        //console.debug("Receive SET VOLUME LEVEL" + message.remoteSetVolumeLevel.toJSON().toString());
+                        //this.emit('log.debug', "Receive SET VOLUME LEVEL" + message.remoteSetVolumeLevel.toJSON().toString());
                     }
                     else if(message.remoteSetPreferredAudioDevice){
-                        //console.debug("Receive SET PREFERRED AUDIO DEVICE" + message.remoteSetPreferredAudioDevice);
+                        //this.emit('log.debug', "Receive SET PREFERRED AUDIO DEVICE" + message.remoteSetPreferredAudioDevice);
                     }
                     else if(message.remoteError){
-                        //console.debug("Receive REMOTE ERROR");
+                        //this.emit('log.debug', "Receive REMOTE ERROR");
                         this.emit('error', {error : message.remoteError});
                     }
                     else{
-                        console.log("What else ?");
+                        this.emit('log.default', "What else ?");
                     }
                     this.chunks = Buffer.from([]);
                 }
             });
 
             this.client.on('close', async (hasError) => {
-                console.info(this.host + " Remote Connection closed ", hasError);
+                this.emit('close', hasError);
+                this.emit('log.info', this.host + " Remote Connection closed ", hasError);
                 if(hasError){
                     reject(this.error.code);
                     if(this.error.code === "ECONNRESET"){
@@ -122,9 +124,9 @@ class RemoteManager extends EventEmitter {
                     }
                     else if(this.error.code === "ECONNREFUSED"){
                         // L'appareil n'est pas encore prêt : on relance
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await new Promise(resolve => setTimeout(resolve, this.reconnectTimeout));
                         await this.start().catch((error) => {
-                            console.error(error);
+                            this.emit('log.error', error);
                         });
                     }
                     else if(this.error.code === "EHOSTDOWN"){
@@ -132,23 +134,23 @@ class RemoteManager extends EventEmitter {
                     }
                     else{
                         // Dans le doute on redémarre
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await new Promise(resolve => setTimeout(resolve, this.reconnectTimeout));
                         await this.start().catch((error) => {
-                            console.error(error);
+                            this.emit('log.error', error);
                         });
                     }
                 }
                 else {
-                    // Si pas d'erreur on relance. Si elle s'est éteinte alors une erreur empéchera de relancer encore
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // If there is no error, we restart. If it has turned off, then an error will prevent it from restarting again.
+                    await new Promise(resolve => setTimeout(resolve, this.reconnectTimeout));
                     await this.start().catch((error) => {
-                        console.error(error);
+                        this.emit('log.error', error);
                     });
                 }
             });
 
             this.client.on('error', (error) => {
-                console.error(this.host, error);
+                this.emit('log.error', this.host, error);
                 this.error = error;
             });
         });
